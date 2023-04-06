@@ -1,0 +1,8 @@
+.ipynb_checkpoints
+rice_prelim
+01_data
+02_figures
+experiment_config.json
+*.sh
+*.out
+.snakemake
