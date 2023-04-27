@@ -13,17 +13,18 @@ def make_df(salmon_dir):
 	sample_info = []
 	salmon_file = []
 	for folder in os.listdir(salmon_dir):
-		if folder.endswith("_salmon"):
+		if folder.startswith("SRR"):
 			json_file = salmon_dir+folder+"/aux_info"+"/meta_info.json"
 			#print(json_file)
 			with open(json_file, "r") as infile:
 				meta_info = json.load(infile)
 				map_percent = meta_info["percent_mapped"]
 				dir_split = json_file.strip().split("/")
-				name_info = dir_split[8].split(".")[0]
+				#print(dir_split)
+				name_info = dir_split[8]
 				print(name_info)
-				if name_info.endswith("_1"):
-					name_info = name_info.split("_")[0]
+				#if name_info.endswith("_1"):
+				#	name_info = name_info.split("_")[0]
 				sample_info.append(name_info)
 				percent_mapped.append(map_percent)
 				salmon_file.append(salmon_dir+folder+"/quant.sf")
@@ -39,6 +40,7 @@ def main():
 	outfilename = str(args.outfilename)
 
 	df = make_df(directory)
+	print(df.head())
 
 	# print the statistics
 	print("maximum mapping rate:",max(df["Percent_Mapped"]))
