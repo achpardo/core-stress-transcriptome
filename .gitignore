@@ -1,8 +1,10 @@
 .ipynb_checkpoints
 rice_prelim
-01_data
+data
 02_figures
 experiment_config.json
 *.sh
 *.out
 .snakemake
+make_pipeline_samptable.ipynb
+srr.ipynb
