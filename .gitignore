@@ -8,3 +8,4 @@ experiment_config.json
 .snakemake
 make_pipeline_samptable.ipynb
 srr.ipynb
+figures
