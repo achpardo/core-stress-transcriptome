@@ -9,3 +9,5 @@ experiment_config.json
 make_pipeline_samptable.ipynb
 srr.ipynb
 figures
+.RData
+.Rhistory
