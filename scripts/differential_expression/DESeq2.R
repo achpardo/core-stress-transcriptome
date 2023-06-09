@@ -3,34 +3,38 @@
 # Author: Anna Pardo
 # Date initiated: June 5, 2023
 
+# parse command line args
+args = commandArgs(TRUE)
+txi_file = args[1]
+## txi_files is the full path to the txi.RData file for the given BioProject
+## must extract the BioProject name for downstream usage
+filename <- basename(txi_file)
+bp <- unlist(strsplit(filename,"7-"))[1]
+bioproject <- unlist(strsplit(bp,"_"))[2]
+bioproject
+
 # load required packages
 library(readr)
 library(tximport)
 library(DESeq2)
 library(dplyr)
-
-# set working directory
-setwd("//wsl.localhost/Ubuntu/home/leviathan22/core-stress-transcriptome/scripts/differential_expression/")
+library(stringr)
 
 ###### Run DESeq2 from tximport output #######
 
 # load tximport RData file
-load("//wsl.localhost/Ubuntu/home/leviathan22/core-stress-transcriptome/data/txi_forDE_06-Jun-2023.RData")
+load(txi_file)
 
 # data wrangling
-## load in list of samples for DE
-samp <- read_delim("//wsl.localhost/Ubuntu/home/leviathan22/core-stress-transcriptome/data/samples_for_de.txt",col_names = F,delim = "\t")
-samp <- samp$X1
-
 ## load in metadata
-md <- read_csv("//wsl.localhost/Ubuntu/home/leviathan22/core-stress-transcriptome/data/metadata_for_DESeq_samples.csv",col_names = T)
+md <- read_csv("/mnt/research/VanBuren_Lab/02_users/Anna_Haber/core-stress-transcriptome/01_data/02_sra_metadata/metadata_for_DESeq_samples.csv",col_names = T)
 head(md)
 
-# subset metadata to only the samples found in the sample list
-mdsub <- md[which(md$Sample %in% samp),]
+# subset metadata to only contain the BioProject of relevance
+mdb <- md %>% filter(BioProject == bioproject)
+head(mdb)
 
 # generate unique sample condition identifiers containing the following information:
-#   BioProject
 #   Genotype
 #   Treatment
 #   Duration_hours (time point)
@@ -38,9 +42,56 @@ mdsub <- md[which(md$Sample %in% samp),]
 #   Concentration
 #   Developmental_stage
 #   Tissue
-mdsub$identifier <- paste(mdsub$BioProject,mdsub$Genotype,mdsub$Treatment,mdsub$Duration_hours,mdsub$Concentration_mM,mdsub$Concentration,
-                          mdsub$Developmental_stage,mdsub$Tissue,sep = "_")
+mdb$identifier <- paste(mdb$Genotype,mdb$Treatment,mdb$Duration_hours,mdb$Concentration_mM,mdb$Concentration,mdb$Developmental_stage,mdb$Tissue,sep = "_")
 
 # run DESeq
-DESeq_obj <- DESeqDataSetFromTximport(txi = txi,colData = mdsub,design = ~identifier)
+DESeq_obj <- DESeqDataSetFromTximport(txi = txi,colData = mdb,design = ~identifier)
 dds_obj <- DESeq(DESeq_obj)
+
+get_sig_df = function(df,cont){
+    df = mutate(df,GeneID = rownames(df),Contrast = cont)
+    df = df[which(df$padj<0.05),]
+    return(df)
+}
+
+expConditions <- unique(mdb$identifier)
+
+# set up reference levels: anything that contains Control is a reference level
+refLevels = list()
+x=1
+for(i in 1:length(expConditions)){
+	if(str_detect(expConditions[i],"Control")==TRUE){
+		refLevels[x] <- expConditions[i]
+		x=x+1
+	}
+}
+
+# the following code is mostly taken from Jeremy Pardo's DESeq2 script
+# https://github.com/pardojer23/RNAseqV2/blob/master/RNAseqV2/R_Scripts/DESeq2.r
+print(paste("Collecting results using the following treatment(s) as reference:",refLevels,sep=" "))
+
+compare_list = list()
+x=1
+for (i in 1:length(refLevels)){
+    for (j in 1:length(expConditions)){
+        if (expConditions[j] != refLevels[i]){
+            compare_list[x] = paste0(as.character(refLevels[i]),"-",as.character(expConditions[j]))
+            x = x+1
+        }
+    }
+}
+
+df_list = list()
+for (i in 1:length(compare_list)){
+    print(compare_list[i][1])
+    condition_list = unlist(strsplit(as.character(compare_list[i][1]),"-"))
+    contrast = paste0(condition_list[1],"-V-",condition_list[2])
+    print(contrast)
+    df_list[[i]] = assign(paste0(contrast,"_sig"),get_sig_df(assign(contrast,as.data.frame(results(dds_obj,contrast=c("identifier",condition_list[2],condition_list[1]),alpha=0.05,pAdjustMethod = "fdr"))),contrast))
+}
+DE_Gene_df = bind_rows(df_list)
+
+# set filename
+filename = paste0("/mnt/research/VanBuren_Lab/02_users/Anna_Haber/core-stress-transcriptome/01_data/03_processed_RNAseq_data/DESeq_outputs/",bioproject,"_DEG_df.txt")
+#write file
+write_delim(DE_Gene_df,filename,delim="\t")
