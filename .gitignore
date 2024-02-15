@@ -12,3 +12,6 @@ figures
 .RData
 .Rhistory
 *.swp
+00_scripts
+01_data
+*.csv
