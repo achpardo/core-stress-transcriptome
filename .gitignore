@@ -16,3 +16,4 @@ figures
 01_data
 *.csv
 genotype_BioProject_treatment_modeling.R
+*.tsv
