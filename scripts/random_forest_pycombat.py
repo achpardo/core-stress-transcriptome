@@ -328,7 +328,7 @@ def main():
     dirpath = str(args.path)
 
     # load and clean the TPM data; subset to a single stress if specified
-    cleaned_tpm = load_clean_data(tpm_file,single_stress)
+    cleaned_tpm = load_clean_data(tpm_file,single_stress="none")
 
     # set variables for downsampling and whether data are balanced
     bal = check_if_balanced(cleaned_tpm)
