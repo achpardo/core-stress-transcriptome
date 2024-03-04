@@ -256,7 +256,7 @@ def plot_roc_curve(rf_tuned_fit,X_test,y_test,plot_filename,data_filename):
     # return AUC score for later use
     return roc_auc
 
-def plot_confusion_matrix(cm,classes=[0,1],normalize=False,cmap=plt.cm.Blues,filename):
+def plot_confusion_matrix(cm,filename,classes=[0,1],normalize=False,cmap=plt.cm.Blues):
     """
     Args:
         cm = confusion matrix
@@ -346,7 +346,7 @@ def main():
         us = "none"
 
     # log transform the data, and downsample if specified
-    log_tpm = pre_split_transform(cleaned_tpm,bal,ds)
+    log_tpm = pre_split_process(cleaned_tpm,bal,ds)
 
     # split the data into training and testing sets
     X_train, y_train, X_test, y_test = split_prep_stressor(single_stress,log_tpm,us)
