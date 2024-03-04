@@ -100,13 +100,13 @@ def pre_split_process(log_tpm,balanced,downsample=False):
     if balanced==True:
         if downsample==True:
             # add back labels
-            log_tpm = blt[["Sample","Label"]].merge(log_tpm.reset_index().rename(columns={"index":"Sample"}))
+            tpmi = blt[["Sample","Label"]].merge(tpmi.reset_index().rename(columns={"index":"Sample"}))
             # set Sample as index
-            log_tpm = log_tpm.set_index("Sample")
+            tpmi = tpmi.set_index("Sample")
             # downsample the data
-            log_tpm = downsample(log_tpm)
+            tpmi = downsample(tpmi)
     # add treatment, labels, and BioProject back in, set Sample as the index again
-    labeled = blt.merge(log_tpm.reset_index().rename(columns={"index":"Sample"}))
+    labeled = blt.merge(tpmi.reset_index().rename(columns={"index":"Sample"}))
     labeled.set_index("Sample",inplace=True)
     # return dataframe
     return labeled
