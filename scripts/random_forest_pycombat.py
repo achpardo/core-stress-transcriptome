@@ -97,8 +97,8 @@ def pre_split_process(log_tpm,balanced,downsample=False):
     if "Treatment" in log_tpm.columns:
         log_tpm = log_tpm.drop("Treatment",axis=1)
     # temporarily, set index to Sample and drop BioProject, Label, & Treatment columns
-    blt = log_tpm[["Sample","BioProject","Treatment","Label"]]
-    tpmi = log_tpm.set_index("Sample").drop(["BioProject","Treatment","Label"],axis=1)
+    blt = log_tpm[["Sample","BioProject","Label"]]
+    tpmi = log_tpm.set_index("Sample").drop(["BioProject","Label"],axis=1)
     # downsample data if needed
     if balanced==True:
         if downsample==True:
