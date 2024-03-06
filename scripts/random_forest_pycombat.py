@@ -314,6 +314,7 @@ def generate_basename(stressor,sampling):
         sampling = Up, Down, or none
     """
     basename = stressor+"Test_"+sampling
+    return basename
 
 def main():
     parser = argparse.ArgumentParser(description="Parse args")
@@ -367,7 +368,7 @@ def main():
 
     # Generate the output directory
     base = generate_basename(single_stress,sampling)
-    directory = path+"/"+base+"_output"
+    directory = dirpath+"/"+base+"_output"
     os.mkdir(directory)
 
     # output ROC curve
