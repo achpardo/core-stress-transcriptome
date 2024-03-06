@@ -228,7 +228,7 @@ def plot_roc_curve(rf_tuned_fit,X_test,y_test,plot_filename,data_filename):
         data_filename = filename with directory and extension (tab delimited) for false & true positive rate data
     """
     # Calculate the probabilities of the classes
-    y_prob = rfclf_tuned.predict_proba(X_test)[:, 1]
+    y_prob = rf_tuned_fit.predict_proba(X_test)[:, 1]
 
     # Compute the ROC curve
     fpr, tpr, _ = roc_curve(y_test,y_prob)
