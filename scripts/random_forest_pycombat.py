@@ -369,10 +369,12 @@ def main():
     # Generate the output directory
     base = generate_basename(single_stress,sampling)
     directory = dirpath+"/"+base+"_output"
-    os.mkdir(directory)
+    if not os.path.exists(directory):
+        os.mkdir(directory)
 
     # output ROC curve
     auc = plot_roc_curve(rfclf_tuned,X_test,y_test,directory+"/"+base+"_ROC_Curve",directory+"/"+base+"_FPR_TPR_data.tsv")
+    plt.clf()
 
     # output accuracy, F1, precision, and recall as a file
     get_scores(y_test,y_pred,directory+"/"+base+"_scores.json",auc)
