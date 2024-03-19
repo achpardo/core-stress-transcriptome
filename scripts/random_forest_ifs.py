@@ -61,7 +61,7 @@ def subset_tpm(raw_tpm,gene_list):
         if not c.startswith("Zm"):
             cols.append(c)
     glist = gene_list + cols
-    subtpm = raw_tpm[raw_tpm.columns.isin(glist)]]
+    subtpm = raw_tpm[raw_tpm.columns.isin(glist)]
     return subtpm
 
 def check_if_balanced(labeled_tpm):
