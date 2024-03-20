@@ -61,7 +61,7 @@ def subset_tpm(raw_tpm,gene_list):
         if not c.startswith("Zm"):
             cols.append(c)
     glist = gene_list + cols
-    subtpm = raw_tpm[raw_tpm.columns.isin(glist)]
+    subtpm = raw_tpm[glist]
     return subtpm
 
 def check_if_balanced(labeled_tpm):
@@ -233,8 +233,8 @@ def main():
     # subset TPM to certain features only; create a dictionary of output dataframes
     subtpmdict = {}
     for k,v in fjson.items():
-        cleaned_tpm = subset_tpm(cleaned_tpm,v)
-        subtpmdict[k] = cleaned_tpm
+        print(k)
+        subtpmdict[k] = subset_tpm(cleaned_tpm,v)
 
     # set variables for downsampling and whether data are balanced
     bal = check_if_balanced(cleaned_tpm)
