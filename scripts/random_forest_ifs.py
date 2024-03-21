@@ -217,7 +217,6 @@ def main():
     # subset TPM to certain features only; create a dictionary of output dataframes
     subtpmdict = {}
     for k,v in fjson.items():
-        print(k)
         subtpmdict[k] = subset_tpm(cleaned_tpm,v)
 
     # set variables for downsampling and whether data are balanced
@@ -237,6 +236,9 @@ def main():
     for k,v in subtpmdict.items():
         log_tpm = pre_split_process(v,bal,ds)
         log_subtpmdict[k] = log_tpm
+        print(k)
+        print("Index length:",len(log_tpm.index))
+        print("Number of columns:",len(log_tpm.columns))
 
     # load hyperparameters to be used
     hp = json.load(open(hyperparameters))
