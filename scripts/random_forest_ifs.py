@@ -191,30 +191,12 @@ def split_prep_stressor(stressor,dataframe,balance="Up"):
     # return training and test data
     return X_train, y_train, X_test, y_test
 
-def get_tuned_rf(X_train, y_train, random_grid):
-    rf = RandomForestClassifier()
-    rf_random = RandomizedSearchCV(estimator=rf,
-                                  param_distributions=random_grid,
-                                  n_iter=50,
-                                  cv=5,
-                                  verbose=2,
-                                  random_state=42,
-                                  n_jobs=-1)
-    rf_random.fit(X_train, y_train)
-    hyper = rf_random.best_params_
-    rfclf_tune = RandomForestClassifier(n_estimators=hyper["n_estimators"],
-                                min_samples_split=hyper["min_samples_split"],
-                                    min_samples_leaf=hyper["min_samples_leaf"],
-                                   max_features=hyper["max_features"],
-                                   max_depth=hyper["max_depth"],
-                                   bootstrap=hyper["bootstrap"])
-    return rfclf_tune
-
 def main():
     parser = argparse.ArgumentParser(description="Parse args")
     parser.add_argument("--tpm_file","-t",type=str,help="full path to TPM file")
     parser.add_argument("--single_stress","-i",type=str,help="options: none or a single stress, e.g. Drought")
     parser.add_argument("--sampling","-s",type=str,help="whether to upsample, downsample, or do nothing if data are unbalanced, options: Up, Down, or none")
+    parser.add_argument("--hyperparameters","-y",type=str,help="full path to hyperparameters JSON file")
     parser.add_argument("--path","-p",type=str,help="path to parent directory where output directory should be placed")
     parser.add_argument("--features_json","-f",type=str,help="path to JSON with subsets of features")
     parser.add_argument("--dataset","-d",type=str,help="options: All or Leaf")
@@ -222,6 +204,7 @@ def main():
     tpm_file = str(args.tpm_file)
     single_stress = str(args.single_stress)
     sampling = str(args.sampling)
+    hyperparameters = str(args.hyperparameters)
     dirpath = str(args.path)
     features_json = str(args.features_json)
     dataset = str(args.dataset)
@@ -255,14 +238,9 @@ def main():
         log_tpm = pre_split_process(v,bal,ds)
         log_subtpmdict[k] = log_tpm
 
-    # create dictionary of hyperparameters to search
-    random_search_grid = {'bootstrap': [True, False],
-        'max_depth': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, None],
-        'max_features': ['sqrt','log2',None],
-        'min_samples_leaf': [1, 2, 4],
-        'min_samples_split': [2, 5, 10],
-        'n_estimators': [100, 200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000]}
-
+    # load hyperparameters to be used
+    hp = json.load(open(hyperparameters))
+    
     # loop through log_subtpmdict to run random forest
     ## outputs to save: accuracy, AUC, F1
     outputsdict = {"n_features":[],"accuracy":[],"AUC":[],"F1_class0":[],"F1_class1":[]}
@@ -270,10 +248,10 @@ def main():
         # split the data into training and testing sets
         X_train, y_train, X_test, y_test = split_prep_stressor(single_stress,v,us)
 
-        # tune the model
-        rfclf_tuned = get_tuned_rf(X_train,y_train,random_search_grid)
+        # set up the model
+        rfclf_tuned = RandomForestClassifier(n_estimators=hp["n_estimators"],min_samples_split=hp["min_samples_split"],min_samples_leaf=hp["min_samples_leaf"],max_features=hp["max_features"],max_depth=hp["max_depth"],bootstrap=hp["bootstrap"])
 
-        # fit the model again on the training data
+        # fit the model on the training data
         rfclf_tuned.fit(X_train,y_train)
 
         # make predictions on testing set
