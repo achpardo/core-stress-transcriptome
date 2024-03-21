@@ -195,7 +195,7 @@ def get_tuned_rf(X_train, y_train, random_grid):
     rf = RandomForestClassifier()
     rf_random = RandomizedSearchCV(estimator=rf,
                                   param_distributions=random_grid,
-                                  n_iter=150,
+                                  n_iter=50,
                                   cv=5,
                                   verbose=2,
                                   random_state=42,
@@ -224,6 +224,7 @@ def main():
     sampling = str(args.sampling)
     dirpath = str(args.path)
     features_json = str(args.features_json)
+    dataset = str(args.dataset)
 
     # load and clean the TPM data; subset to a single stress if specified
     cleaned_tpm = load_clean_data(tpm_file,single_stress="none")
@@ -257,7 +258,7 @@ def main():
     # create dictionary of hyperparameters to search
     random_search_grid = {'bootstrap': [True, False],
         'max_depth': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, None],
-        'max_features': ['sqrt','log2','none'],
+        'max_features': ['sqrt','log2',None],
         'min_samples_leaf': [1, 2, 4],
         'min_samples_split': [2, 5, 10],
         'n_estimators': [100, 200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000]}

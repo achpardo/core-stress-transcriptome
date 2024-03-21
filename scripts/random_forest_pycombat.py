@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import pickle as pkl
 import argparse
 import numpy as np
 import pandas as pd
@@ -198,7 +199,7 @@ def get_tuned_rf(X_train, y_train, random_grid):
                                    max_features=hyper["max_features"],
                                    max_depth=hyper["max_depth"],
                                    bootstrap=hyper["bootstrap"])
-    return rfclf_tune
+    return rfclf_tune,hyper
 
 def get_scores(y_test,y_pred,filename,AUC):
     """
@@ -355,10 +356,10 @@ def main():
         'max_features': ['sqrt','log2','none'],
         'min_samples_leaf': [1, 2, 4],
         'min_samples_split': [2, 5, 10],
-        'n_estimators': [100, 200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000]}
+        'n_estimators': [100, 200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800]}
 
     # tune the model
-    rfclf_tuned = get_tuned_rf(X_train,y_train,random_search_grid)
+    rfclf_tuned,hyperparams = get_tuned_rf(X_train,y_train,random_search_grid)
 
     # fit the model again on the training data
     rfclf_tuned.fit(X_train,y_train)
@@ -385,6 +386,14 @@ def main():
 
     # output feature importances
     extract_importances(rfclf_tuned,log_tpm,directory+"/"+base+"_Feature_Importances_sorted.tsv")
+
+    # save final tuned model
+    with open(os.path.join(directory,base+"_TunedModel.pkl"),"wb") as outfile:
+        pkl.dump(rfclf_tuned,outfile)
+
+    # save final hyperparameters of tuned model
+    with open(os.path.join(directory,base+"_Hyperparameters.json"),"w+") as outfile:
+        json.dump(hyperparams,outfile,indent=4)
 
 if __name__ == "__main__":
     main()
