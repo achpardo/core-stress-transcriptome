@@ -236,9 +236,6 @@ def main():
     for k,v in subtpmdict.items():
         log_tpm = pre_split_process(v,bal,ds)
         log_subtpmdict[k] = log_tpm
-        print(k)
-        print("Index length:",len(log_tpm.index))
-        print("Number of columns:",len(log_tpm.columns))
 
     # load hyperparameters to be used
     hp = json.load(open(hyperparameters))
@@ -264,17 +261,17 @@ def main():
 
         # get & save accuracy
         acc = accuracy_score(y_test,y_pred)
-        outputsdict["accuracy"] = acc
+        outputsdict["accuracy"].append(acc)
         
         # get & save F1 scores
         f1 = list(f1_score(y_test,y_pred,average=None))
-        outputsdict["F1_class0"] = f1[0]
-        outputsdict["F1_class1"] = f1[1]
+        outputsdict["F1_class0"].append(f1[0])
+        outputsdict["F1_class1"].append(f1[1])
 
         # get & save AUC
         y_prob = rfclf_tuned.predict_proba(X_test)[:,1]
         roc_auc = roc_auc_score(y_test,y_prob)
-        outputsdict["AUC"] = roc_auc
+        outputsdict["AUC"].append(roc_auc)
 
     # convert outputsdict to a dataframe
     outdf = pd.DataFrame(outputsdict)
