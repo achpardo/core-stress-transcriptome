@@ -26,13 +26,19 @@ setwd(out)
 #Reads in TPM data
 data <- read.table(file, sep = ",", header = TRUE, row.names = 1)
 #print(head(data))
+library(readr)
+data <- read.table("//wsl$/Ubuntu/home/leviathan22/core-stress-transcriptome/data/BPcombat_TPM_coregenes_psyntissues_WGCNA.tsv")
+rownames(data) <- data$Sample
 
 #Transposes data so WGCNA can read it
 data_2 = as.data.frame(t(data))
+data_2 = t(data)
+data_3 = data.frame(data_2)
 print(dim(data_2))
 
 #Filters data and writes new csv with only selected data
-gsg = goodSamplesGenes(data_2, verbose = 1) #verbosity only refers to the actual output of the function - it does not effect how the function works!
+
+gsg = goodSamplesGenes(data, verbose = 1) #verbosity only refers to the actual output of the function - it does not effect how the function works!
 gsg$allOK
 if(!gsg$allOK)
 {
