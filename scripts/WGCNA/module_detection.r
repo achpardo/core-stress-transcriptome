@@ -25,10 +25,10 @@ out = opt$output
 setwd(out)
 
 #Reads input data obtained from module_sft.r
-data = load("//wsl.localhost/Ubuntu/home/leviathan22/core-stress-transcriptome/data/WGCNA_output/data_input.RData")
+data = load(file)
 
 #Defines soft thresholding power and creates adjacency matrix
-softPower = 9
+softPower = sft_power
 adjacency = adjacency(data_2, power = softPower, type = 'signed')
 
 save(adjacency, file="adjacency_matrix.RData")

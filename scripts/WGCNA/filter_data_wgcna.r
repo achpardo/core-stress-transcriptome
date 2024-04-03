@@ -4,7 +4,14 @@
 ##--outputdir should have "/" at the end
 
 # install WGCNA
-install.packages("WGCNA",repos="https://repo.miserver.it.umich.edu/cran/")
+#install.packages("WGCNA",repos="https://repo.miserver.it.umich.edu/cran/")
+
+# install GO.db
+#if (!require("BiocManager",quietly=TRUE))
+#    install.packages("BiocManager")
+
+#BiocManager::install("GO.db")
+#library(GO.db)
 
 #Loads necessary libraries
 library(optparse)
@@ -24,8 +31,9 @@ out = opt$outputdir
 setwd(out)
 
 #Reads in TPM data
-data <- read.table(file, sep = ",", header = TRUE, row.names = 1)
-#print(head(data))
+data <- read.table(file, sep = "\t", header = TRUE, row.names = 1)
+rownames(data) <- data$GeneID
+print(head(data))
 
 #Transposes data so WGCNA can read it
 data_2 = as.data.frame(t(data))
