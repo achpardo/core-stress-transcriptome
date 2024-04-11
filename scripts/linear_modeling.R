@@ -23,17 +23,17 @@ modelout <- lm(PC1 ~ Treatment + Tissue, data=expmd)
 
 summary(modelout)
 
-Anova(modelout)
+anova(modelout)
 
 # single-factor for genotype
 gtmod <- lm(PC1 ~ Genotype, data=expmd)
 
 summary(gtmod)
-Anova(gtmod)
+anova(gtmod)
 
 # try all four factors (no interactions)
 fourfac <- lm(PC1 ~ Genotype + BioProject + Treatment + Tissue,data=expmd)
-Anova(fourfac)
+anova(fourfac)
 ffcoef <- as.data.frame(fourfac$coefficients)
 
 # load dfgt20: same as expmd, but only for genotypes with >20 samples
@@ -41,11 +41,20 @@ dfgt20 <- read.csv("//wsl$/Ubuntu/home/leviathan22/core-stress-transcriptome/dat
 
 # re-run four-factor no interaction model on this dataset
 ffni <- lm(PC1 ~ Genotype + BioProject + Treatment + Tissue,data=dfgt20)
-Anova(ffni)
+anova(ffni)
 
 # remove control for testing purposes
 library(dplyr)
 dfnocont <- dfgt20 %>% filter(Treatment != "Control")
 
 ffni <- lm(PC1 ~ Genotype + BioProject + Treatment + Tissue,data=dfnocont)
-Anova(ffni)
+anova(ffni)
+
+
+# work on April 3, 2024: repeat linear modeling with corrected data (all tissues)
+## load all samples' corrected TPM
+correxp <- read.csv("//wsl$/Ubuntu/home/leviathan22/core-stress-transcriptome/data/expressionPCs_metadata_correctedTPM.csv")
+
+# run model with all four factors (no interactions)
+fourfac <- lm(PC1 ~ Genotype + BioProject + Treatment + Tissue,data=correxp)
+anova(fourfac)
