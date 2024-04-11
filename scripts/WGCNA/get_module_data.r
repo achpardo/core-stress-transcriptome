@@ -17,12 +17,17 @@ dir = opt$outputdir
 
 #Sets working directory so all output files are written here
 setwd(dir)
+# set working directory - RStudio on demand session
+setwd("/mnt/research/VanBuren_Lab/02_users/Anna_Haber/core-stress-transcriptome/01_data/WGCNA_01-Apr-2024/")
 
 #Loads data
 cnames = load(file1)
 dnames = load(file2)
 print(cnames)
 print(dnames)
+# load data - RStudio on demand session
+cnames = load("./data_input.RData")
+dnames = load("./modules/module_info_no_TOM.RData")
 
 #Creates new matrix to store one of each module color
 length = length(MEs)

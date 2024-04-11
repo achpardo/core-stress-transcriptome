@@ -32,8 +32,12 @@ setwd(out)
 
 #Reads in TPM data
 data <- read.table(file, sep = "\t", header = TRUE, row.names = 1)
-rownames(data) <- data$GeneID
-print(head(data))
+
+# read in TPM data - ondemand RStudio session
+data <- read.table("/mnt/research/VanBuren_Lab/02_users/Anna_Haber/core-stress-transcriptome/01_data/WGCNA_01-Apr-2024/BPcombat_TPM_allsamp_WGCNA.tsv",
+                   sep = "\t", header = TRUE, row.names = 1)
+#rownames(data) <- data$GeneID
+#print(head(data))
 
 #Transposes data so WGCNA can read it
 data_2 = as.data.frame(t(data))
@@ -46,8 +50,9 @@ if(!gsg$allOK)
 {
 	data_2 = data_2[gsg$goodSamples, gsg$goodGenes]
 }
-write.table(t(data_2), file = "data_used_for_network.txt", quote = FALSE, row.names = TRUE, sep = "\t")
+write.table(t(data_2), file = "/mnt/research/VanBuren_Lab/02_users/Anna_Haber/core-stress-transcriptome/01_data/WGCNA_01-Apr-2024/data_used_for_network.txt", quote = FALSE, row.names = TRUE, sep = "\t")
 print(dim(data_2))
+print(head(data_2))
 
 #Hierarchal clustering to detect outliers
 sampleTree = hclust(dist(data_2), method = "average")
@@ -57,4 +62,4 @@ par(mar = c(0,4,2,0))
 plot(sampleTree, main = "Sample clustering to detect outliers", sub="", xlab="", cex.lab = 1.5, cex.axis = 1.5, cex.main = 2)
 
 #Saves input data
-save(data_2, file = "data_input.RData")
+save(data_2, file = "/mnt/research/VanBuren_Lab/02_users/Anna_Haber/core-stress-transcriptome/01_data/WGCNA_01-Apr-2024/data_input.RData")
